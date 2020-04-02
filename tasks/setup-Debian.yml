@@ -1,0 +1,32 @@
+---
+- name: Check if the current version is installed.
+  stat:
+    path: "{{ loki_home_dir }}/loki-{{ loki_version }}"
+  register: loki_version_stats
+
+- name: Download loki.
+  when: loki_version_stats.stat.exists == false
+  get_url:
+    url: "https://github.com/grafana/loki/releases/download/v{{ loki_version }}/loki-linux-amd64.zip"
+    dest: "{{ loki_home_dir }}/loki-linux-amd64.zip"
+    force: yes
+
+- name: Unpack tarball.
+  when: loki_version_stats.stat.exists == false
+  unarchive:
+    src: "{{ loki_home_dir }}/loki-linux-amd64.zip"
+    dest: "{{ loki_home_dir }}"
+    remote_src: yes
+
+- name: Copy systemd service file.
+  template: src=loki.service.j2 dest=/etc/systemd/system/loki.service
+  notify:
+    - restart loki
+
+- name: Create symlink.
+  file:
+    src: "{{ loki_home_dir }}/loki-{{ loki_version }}"
+    dest: "{{ loki_executable }}"
+    state: link
+  notify:
+    - restart loki

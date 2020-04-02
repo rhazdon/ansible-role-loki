@@ -1,0 +1,9 @@
+---
+loki_version: "1.3.0"
+
+# Installation from source settings
+loki_install_from_source: false
+loki_home_dir: /opt/loki
+loki_config_dir: /etc/loki
+loki_executable: /usr/local/bin/loki
+loki_executable_options:

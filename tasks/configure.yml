@@ -1,0 +1,10 @@
+---
+- name: Ensure config directory exist.
+  file:
+    path: "{{ loki_config_dir }}"
+    state: directory
+
+- name: Copy loki config file
+  template: "src=config.yml.j2 dest={{ loki_config_dir }}/config.yml"
+  notify:
+    - restart loki
